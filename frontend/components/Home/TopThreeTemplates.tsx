@@ -21,9 +21,13 @@ const TopThreeTemplates = () => {
   if (templateMaps.data && templateMaps.isSuccess) {
     return (
       <div>
-        <div className="mb-12 text-center">
-          <h2 className="font-semibold text-themeGreen">Try them out!</h2>
-          <h1 className="text-6xl font-bold text-white">Featured Templates</h1>
+        <div className="mb-10 text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+            Try them out
+          </p>
+          <h2 className="mt-2 font-display text-4xl font-semibold text-foreground md:text-5xl">
+            Featured specimens
+          </h2>
         </div>
         <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {templateMaps.data?.map((template: ITemplate, index: number) => (

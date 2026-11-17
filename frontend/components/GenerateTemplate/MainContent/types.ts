@@ -1,11 +1,11 @@
 export enum EditModeOne {
   EDIT = "Edit",
-  PREVIEW = "Preview",
+  PREVIEW = "Proof",
   RAW = "Raw",
 }
 
 export enum EditModeTwo {
-  EDIT_PREVIEW = "Edit & Preview",
+  EDIT_PREVIEW = "Edit & Proof",
   RAW = "Raw",
 }
 

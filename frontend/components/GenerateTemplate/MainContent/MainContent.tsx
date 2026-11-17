@@ -86,8 +86,8 @@ const MainContent: React.FC<{
   return (
     <div className="flex flex-col">
       <main className="flex flex-1 flex-col gap-4 p-4 xl:gap-6 xl:p-6">
-        <div className="flex items-center justify-between gap-6">
-          <div className="flex items-center justify-center gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <ToggleViewButton
               numberOfViewsToShow={numberOfViewsToShow}
               setNumberOfViewsToShow={setNumberOfViewsToShow}
@@ -100,7 +100,7 @@ const MainContent: React.FC<{
             />
           </div>
 
-          <div className="flex items-center justify-end gap-6">
+          <div className="flex flex-wrap items-center justify-end gap-4">
             <CopyButton copiedText={output} />
             <DownloadButton downloadText={output} fileName={"README.md"} />
           </div>

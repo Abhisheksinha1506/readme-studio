@@ -3,7 +3,7 @@ import { Metadata } from "next"
 import PlausibleProvider from "next-plausible"
 
 import { siteConfig } from "@/config/site"
-import { fontSans } from "@/lib/fonts"
+import { fontDisplay, fontMono, fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
 import Footer from "@/components/Home/Footer"
 import { SiteHeader } from "@/components/site-header"
@@ -30,8 +30,8 @@ export const metadata: Metadata = {
   authors: [{ name: "Shaan Khan", url: "https://twitter.com/ShaanCoding" }],
   creator: "Shaan Khan",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: light)", color: "#efe8da" },
+    { media: "(prefers-color-scheme: dark)", color: "#17120d" },
   ],
   icons: {
     icon: "/favicon.ico",
@@ -72,11 +72,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <body
           className={cn(
             "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable
+            fontSans.variable,
+            fontDisplay.variable,
+            fontMono.variable
           )}
         >
           <ReactQueryClientProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <div className="relative flex min-h-screen flex-col overflow-hidden">
                 <SiteHeader />
                 <div className="flex-1">{children}</div>

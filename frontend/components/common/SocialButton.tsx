@@ -18,7 +18,7 @@ export const SocialButton: React.FC<{
 
   return (
     <Link href={url}>
-      <Button className={twMerge(className)}>
+      <Button variant="outline" size="sm" className={twMerge(className)}>
         <SocialMediaIcon url={url} />
         View {name}&apos;s {typeMapped}
       </Button>

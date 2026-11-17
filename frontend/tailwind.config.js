@@ -14,10 +14,19 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Home Page
-        themeGreen: "#046367",
-        homeBlue: "#C1FDFF",
-        hoverBlue: "#4493f8",
+        // Letterpress direction: paper/ink grounds, one committed press-red accent.
+        paper: {
+          DEFAULT: "hsl(var(--paper))",
+          dim: "hsl(var(--paper-dim))",
+        },
+        ink: {
+          DEFAULT: "hsl(var(--ink))",
+          dim: "hsl(var(--ink-dim))",
+        },
+        press: {
+          DEFAULT: "hsl(var(--press))",
+          foreground: "hsl(var(--press-foreground))",
+        },
 
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,6 +66,7 @@ module.exports = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        grain: "url('/texture/paper-grain.svg')",
       },
       borderRadius: {
         lg: `var(--radius)`,
@@ -65,6 +75,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
+        display: ["var(--font-display)", ...fontFamily.serif],
+        mono: ["var(--font-mono)", ...fontFamily.mono],
       },
       keyframes: {
         "accordion-down": {

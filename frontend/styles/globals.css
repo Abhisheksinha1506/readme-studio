@@ -2,71 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Letterpress / composing-room direction.
+ * --paper, --ink and --press are mode-invariant raw tokens: the proof panel
+ * and type-specimen cards stay paper-colored even in dark mode, deliberately
+ * contrasting against the surrounding ink chrome. --background etc. flip
+ * between them per mode.
+ */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
+    --paper: 42 38% 92%;
+    --paper-dim: 40 30% 85%;
+    --ink: 25 20% 8%;
+    --ink-dim: 28 16% 14%;
+    --press: 8 58% 42%;
+    --press-foreground: 42 38% 95%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --background: 42 38% 92%;
+    --foreground: 25 20% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
+    --muted: 40 24% 86%;
+    --muted-foreground: 25 10% 35%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --popover: 42 40% 96%;
+    --popover-foreground: 25 20% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
+    --border: 30 15% 70%;
+    --input: 30 15% 70%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --card: 42 40% 96%;
+    --card-foreground: 25 20% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 8 58% 42%;
+    --primary-foreground: 42 38% 95%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --secondary: 40 30% 85%;
+    --secondary-foreground: 25 20% 8%;
 
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 40 28% 82%;
+    --accent-foreground: 25 20% 8%;
 
-    --ring: 215 20.2% 65.1%;
+    --destructive: 0 72% 42%;
+    --destructive-foreground: 42 38% 95%;
 
-    --radius: 0.5rem;
+    --ring: 8 58% 42%;
+
+    --radius: 0.25rem;
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
+    --background: 25 20% 8%;
+    --foreground: 42 38% 92%;
 
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
+    --muted: 28 16% 14%;
+    --muted-foreground: 42 15% 65%;
 
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
+    --popover: 28 16% 14%;
+    --popover-foreground: 42 38% 92%;
 
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
+    --border: 35 15% 25%;
+    --input: 35 15% 25%;
 
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
+    --card: 28 16% 14%;
+    --card-foreground: 42 38% 92%;
 
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
+    --primary: 8 62% 52%;
+    --primary-foreground: 25 20% 8%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
+    --secondary: 28 16% 14%;
+    --secondary-foreground: 42 38% 92%;
 
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
+    --accent: 28 18% 19%;
+    --accent-foreground: 42 38% 92%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 42 38% 92%;
 
-    --ring: 216 34% 17%;
+    --ring: 8 62% 52%;
 
-    --radius: 0.5rem;
+    --radius: 0.25rem;
   }
 }
 
@@ -77,5 +91,24 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Registration-mark motif: printer's register crosshair, used as a small
+   recurring UI element (section corners, active-block indicator, loading). */
+@layer components {
+  .register-mark {
+    @apply pointer-events-none relative inline-block h-3 w-3;
+  }
+  .register-mark::before,
+  .register-mark::after {
+    content: "";
+    @apply absolute bg-current;
+  }
+  .register-mark::before {
+    @apply left-1/2 top-0 h-full w-px -translate-x-1/2;
+  }
+  .register-mark::after {
+    @apply left-0 top-1/2 h-px w-full -translate-y-1/2;
   }
 }

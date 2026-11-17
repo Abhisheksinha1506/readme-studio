@@ -61,10 +61,11 @@ const EditorBlock = ({
             <div className="flex flex-wrap items-center justify-start gap-6">
               <Button
                 variant={"outline"}
-                className="text-red-500"
+                size="sm"
+                className="text-destructive"
                 onClick={() => deleteBlock()}
               >
-                <Trash2Icon className="mr-2" />
+                <Trash2Icon className="mr-2 size-4" />
                 Delete
               </Button>
 

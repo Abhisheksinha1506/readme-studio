@@ -23,7 +23,7 @@ export default async function BlogPage() {
       <div className="flex max-w-screen-2xl flex-1 flex-col gap-4 p-4 xl:gap-6 xl:p-6">
         <div className="flex flex-col items-start gap-4 md:flex-row md:justify-between md:gap-8">
           <div className="flex-1 space-y-4">
-            <h1 className="text-4xl font-semibold text-white">Blog</h1>
+            <h1 className="font-display text-4xl font-semibold text-foreground">Blog</h1>
             <CardDescription>
               A blog built using Contentlayer. Posts are written in MDX.
             </CardDescription>

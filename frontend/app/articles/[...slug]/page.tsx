@@ -96,7 +96,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <div className="flex max-w-screen-2xl flex-1 flex-col gap-4 p-4 xl:gap-6 xl:p-6">
         <div>
           <div className="flex w-full flex-col items-center justify-center text-center">
-            <h1 className="text-4xl font-semibold text-white">{post.title}</h1>
+            <h1 className="font-display text-4xl font-semibold text-foreground">{post.title}</h1>
             {authors?.length ? (
               <div className="mt-4 flex space-x-4">
                 {authors.map((author) =>
