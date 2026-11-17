@@ -17,7 +17,7 @@
         "format": "prettier --config .prettierrc --write .",
         "prepare": "husky",
         "swagger": "tsoa swagger",
-        "test": "echo \"Error: no test specified\"",
+        "test": "tsx --test test/*.test.ts",
         "test:dev": "echo \"Error: no test specified\"",
         "test:cov": "echo \"Error: no test specified\""
     },

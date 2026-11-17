@@ -218,6 +218,7 @@ const MongooseFullTemplateSchema = new Schema({
     pageType: MongoosePageTypeSchema,
     functions: [MongooseFunctionSchema],
 })
+MongooseFullTemplateSchema.index({ folder: 1 }, { unique: true })
 
 // Macros ///////////////////////////////////////////////////////////////
 
@@ -232,6 +233,7 @@ const macroSchema = new Schema({
     name: { type: String, required: true },
     content: { type: String, required: true },
   });
+macroSchema.index({ folder: 1, name: 1 }, { unique: true })
   
 
 export const FullTemplateModel = mongoose.model<FullTemplate>('FullTemplate', MongooseFullTemplateSchema)
