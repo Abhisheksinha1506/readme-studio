@@ -12,7 +12,9 @@ export const openAPIRouter: Router = (() => {
         res.send(openAPIDocument)
     })
 
-    router.use('/', swaggerUi.serve, swaggerUi.setup(openAPIDocument))
+    // Serve the UI only at the root so unmatched paths fall through to the 404 handler.
+    router.use(swaggerUi.serve)
+    router.get('/', swaggerUi.setup(openAPIDocument))
 
     return router
 })()
