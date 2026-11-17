@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { IDefaultBlockInput, IFunction } from "@/openAPI/generated"
 import { useQuery } from "@tanstack/react-query"
+import { useDebounce } from "use-debounce"
 
 import { api } from "@/lib/apiWrapper"
 
@@ -15,6 +16,9 @@ import ToggleViewButton from "./Tabs/ToggleViewButton"
 import { compileString } from "./generator"
 import { EditModeOne, EditModeThree, EditModeTwo } from "./types"
 
+// Quiet period after the last form change before the README is recompiled.
+const COMPILE_DEBOUNCE_MS = 200
+
 const MainContent: React.FC<{
   templateId: string
   templateBlocks: IFunction[]
@@ -22,6 +26,7 @@ const MainContent: React.FC<{
 }> = ({ templateId, templateBlocks, setTemplateBlocks }) => {
   const [macros, setMacros] = useState<string>("")
   const [variables, setVariables] = useState<Record<string, any>>({})
+  const [debouncedVariables] = useDebounce(variables, COMPILE_DEBOUNCE_MS)
   const [output, setOutput] = useState<string>("")
 
   const populateTemplateData = useQuery({
@@ -70,8 +75,8 @@ const MainContent: React.FC<{
   }, [populateMacrosData.data, populateMacrosData.status])
 
   const generateOutput = () => {
-    if (macros && templateBlocks && variables) {
-      const data = compileString(macros, templateBlocks, variables)
+    if (macros && templateBlocks && debouncedVariables) {
+      const data = compileString(macros, templateBlocks, debouncedVariables)
       setOutput(data)
     }
   }
@@ -88,7 +93,7 @@ const MainContent: React.FC<{
     ) {
       generateOutput()
     }
-  }, [variables, templateBlocks, macros])
+  }, [debouncedVariables, templateBlocks, macros])
 
   const [numberOfViewsToShow, setNumberOfViewsToShow] = useState<number>(2)
   const [editMode, setEditMode] = useState<
