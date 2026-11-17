@@ -1,16 +1,16 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import nunjucks from 'nunjucks'
+import { compileString } from '../../src/common/utils/compileTemplate'
 
 /*
- * Test-side replica of the frontend README render pipeline.
+ * Test-side replica of the README render pipeline.
  *
- * Mirrors frontend/components/GenerateTemplate/MainContent/generator.ts
- * (compileString and its helpers) plus the data assembly done by
- * MainContent.tsx, the /v1/template/:id/defaultBlocks endpoint and the
- * /v1/template/:id/macros endpoint, so a template rendered here produces
- * byte-identical output to the browser preview.
+ * Mirrors the data assembly done by MainContent.tsx, the
+ * /v1/template/:id/defaultBlocks endpoint and the /v1/template/:id/macros
+ * endpoint; the actual compile step is the same compileString the backend's
+ * /v1/template/compile route calls, so a template rendered here produces
+ * byte-identical output to what a user sees.
  */
 
 export interface TemplateVariable {
@@ -76,35 +76,6 @@ export const defaultVariables = (orderedBlocks: TemplateBlockFunction[]): Record
         }
     }
     return variables
-}
-
-// --- Below mirrors generator.ts verbatim (logic, not imports) ---
-
-export const combineMacroIntoOrderedFunctionString = (blocks: TemplateBlockFunction[]): string =>
-    blocks
-        .map((func) => {
-            const variableArray: string[] = func.variables.map((variable) => variable.name)
-            return `{{- ${func.function}(${variableArray.join(', ')}) -}}`
-        })
-        .join(' ')
-
-export const mapVariableObjectToString = (variables: Record<string, unknown>): string => {
-    let variablesString = ''
-    Object.keys(variables).forEach((element: string) => {
-        variablesString += `{%- set ${element} = ${JSON.stringify(variables[element])} -%} `
-    })
-    return variablesString
-}
-
-export const compileString = (macros: string, templateBlocks: TemplateBlockFunction[], variables: Record<string, unknown>): string => {
-    nunjucks.configure({ autoescape: false, lstripBlocks: true })
-
-    const specificTemplate = macros
-    const index = combineMacroIntoOrderedFunctionString(templateBlocks)
-    const variableString = mapVariableObjectToString(variables)
-
-    const string = `${variableString} ${specificTemplate} ${index}`
-    return nunjucks.renderString(string, {})
 }
 
 /*

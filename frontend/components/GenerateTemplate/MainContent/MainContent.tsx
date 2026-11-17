@@ -13,7 +13,6 @@ import RawText from "./Editor/RawText/RawText"
 import MainContentTabs from "./Tabs/MainContentTabs"
 import TabContent from "./Tabs/TabContent"
 import ToggleViewButton from "./Tabs/ToggleViewButton"
-import { compileString } from "./generator"
 import { EditModeOne, EditModeThree, EditModeTwo } from "./types"
 
 // Quiet period after the last form change before the README is recompiled.
@@ -24,7 +23,6 @@ const MainContent: React.FC<{
   templateBlocks: IFunction[]
   setTemplateBlocks: React.Dispatch<React.SetStateAction<IFunction[]>>
 }> = ({ templateId, templateBlocks, setTemplateBlocks }) => {
-  const [macros, setMacros] = useState<string>("")
   const [variables, setVariables] = useState<Record<string, any>>({})
   const [debouncedVariables] = useDebounce(variables, COMPILE_DEBOUNCE_MS)
   const [output, setOutput] = useState<string>("")
@@ -50,54 +48,35 @@ const MainContent: React.FC<{
     }
   }, [populateTemplateData.data, populateTemplateData.status])
 
-  const populateMacrosData = useQuery({
-    queryKey: ["postV1TemplateTemplateMacros", templateBlocks],
+  // Rendering runs on the backend, which resolves each block's macro content
+  // itself from (folder, function) identifiers rather than trusting template
+  // source from the client. debouncedVariables is what keeps a request from
+  // firing on every keystroke, same debounce window as before the move.
+  const compileOutput = useQuery({
+    queryKey: ["postV1TemplateCompile", templateBlocks, debouncedVariables],
     queryFn: async () => {
-      const blocksMapped: IDefaultBlockInput[] = templateBlocks.map(
+      const blocks: IDefaultBlockInput[] = templateBlocks.map(
         (block: IFunction) => ({
           function: block.function,
           folder: block.folder,
         })
       )
 
-      let request = await api.template.postV1TemplateTemplateMacros(
-        blocksMapped
-      )
+      const request = await api.template.postV1TemplateCompile({
+        blocks,
+        variables: debouncedVariables,
+      })
 
       return request.responseObject as string
     },
-    // Depends on the chosen blocks only, so blocks added without a template still load their macros.
     enabled: templateBlocks.length > 0,
-    // Macro content for a given set of blocks is static for the backend's lifetime.
-    staleTime: Infinity,
   })
 
   useEffect(() => {
-    if (populateMacrosData.status === "success") {
-      setMacros(populateMacrosData.data!)
+    if (compileOutput.status === "success") {
+      setOutput(compileOutput.data!)
     }
-  }, [populateMacrosData.data, populateMacrosData.status])
-
-  const generateOutput = () => {
-    if (macros && templateBlocks && debouncedVariables) {
-      const data = compileString(macros, templateBlocks, debouncedVariables)
-      setOutput(data)
-    }
-  }
-
-  useEffect(() => {
-    const doesFunctionsExist = templateBlocks.every((block) => {
-      return macros.includes(block.function)
-    })
-
-    if (
-      populateTemplateData.isLoading === false &&
-      populateMacrosData.isLoading === false &&
-      doesFunctionsExist
-    ) {
-      generateOutput()
-    }
-  }, [debouncedVariables, templateBlocks, macros])
+  }, [compileOutput.data, compileOutput.status])
 
   const [numberOfViewsToShow, setNumberOfViewsToShow] = useState<number>(2)
   const [editMode, setEditMode] = useState<
