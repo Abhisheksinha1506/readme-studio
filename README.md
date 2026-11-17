@@ -17,7 +17,7 @@ An awesome ReadMe Generator to Jumpstart your Projects!
 </p>
 </div>
 
-![Contributors](https://img.shields.io/github/contributors/ShaanCoding/makeread.me?color=dark-green) ![Issues](https://img.shields.io/github/issues/ShaanCoding/makeread.me) ![License](https://img.shields.io/github/license/ShaanCoding/makeread.me)
+![CI](https://github.com/ShaanCoding/makeread.me/workflows/CI/badge.svg) ![Contributors](https://img.shields.io/github/contributors/ShaanCoding/makeread.me?color=dark-green) ![Issues](https://img.shields.io/github/issues/ShaanCoding/makeread.me) ![License](https://img.shields.io/github/license/ShaanCoding/makeread.me)
 
 ## Table of Contents
 
