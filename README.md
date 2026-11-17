@@ -17,7 +17,7 @@ An awesome ReadMe Generator to Jumpstart your Projects!
 </p>
 </div>
 
-![CI](https://github.com/ShaanCoding/makeread.me/workflows/CI/badge.svg) ![Contributors](https://img.shields.io/github/contributors/ShaanCoding/makeread.me?color=dark-green) ![Issues](https://img.shields.io/github/issues/ShaanCoding/makeread.me) ![License](https://img.shields.io/github/license/ShaanCoding/makeread.me)
+![CI](https://github.com/Abhisheksinha1506/readme-studio/workflows/CI/badge.svg) ![Contributors](https://img.shields.io/github/contributors/ShaanCoding/makeread.me?color=dark-green) ![Issues](https://img.shields.io/github/issues/ShaanCoding/makeread.me) ![License](https://img.shields.io/github/license/ShaanCoding/makeread.me)
 
 ## Table of Contents
 
@@ -97,7 +97,7 @@ Please follow the following steps for successful installation:
 1. **Clone the Repository:** Get started by cloning the repository to your local machine.
 
    ```
-   https://github.com/ShaanCoding/makeread.me
+   https://github.com/Abhisheksinha1506/readme-studio
    ```
 
 2. **Install Frontend Packages:** Navigate to the &quot;/frontend&quot; directory and install the required yarn packages by executing the following command in your terminal:
@@ -116,11 +116,13 @@ Please follow the following steps for successful installation:
 
    - In the &quot;/backend&quot; directory, copy the content of &quot;.env.example&quot; file and create a new file named &quot;.env&quot;. Adjust the environment variables according to your requirements or you can leave them as it is.
 
-   - Navigate to &quot;frontend/api/generated/readMeGenerator.ts&quot; and set the BASE parameter to your backend API route. For instance, if you are running backend on your local server at port 8080, you should set:
+   - In the &quot;/frontend&quot; directory, create a &quot;.env&quot; file and set `NEXT_PUBLIC_BACKEND_URL` to your backend API route. For instance, if you are running backend on your local server at port 8080:
 
-     ```javascript
-     BASE: "http://localhost:8080/api";
      ```
+     NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
+     ```
+
+     This variable is already read by `frontend/lib/apiWrapper.ts`. The generated API client lives in `frontend/openAPI/generated` and calls the backend under the `/v1` base path, so no code changes are needed.
 
 5. **Run the Backend:** Navigate to &quot;/backend&quot; directory and type the following command in your terminal to run your backend server:
 
@@ -135,6 +137,16 @@ Please follow the following steps for successful installation:
    ```
 
    Now, your application should be successfully up and running!
+
+### Running the tests
+
+The backend has a test suite. From the `backend` directory run:
+
+```sh
+yarn test
+```
+
+CI also runs lint, type checking and builds for both packages on every pull request — see `.github/workflows/ci.yml` for the exact steps.
 
 ## Roadmap
 
