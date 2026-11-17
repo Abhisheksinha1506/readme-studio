@@ -32,21 +32,18 @@ export default class TemplateController {
 
     public async getTemplateMacros(body: DefaultBlockInput[]): Promise<ServiceResponse<string | null>> {
         try {
-            if (!body) {
-                return new ServiceResponse(ResponseStatus.Failed, 'Body is empty', null, StatusCodes.BAD_REQUEST)
+            // An empty $or is rejected by MongoDB, so an empty request is answered directly.
+            if (!body.length) {
+                return new ServiceResponse<string>(ResponseStatus.Success, 'Success', '', StatusCodes.OK)
             }
 
-            let macros = '';
-            for (const block of body) {
-                const {folder, function: name} = block;
-                const macro = await MacroModel.findOne({
-                    folder: folder,
-                    name: name
-                })
-                if (macro) {
-                    macros += macro.content;
-                }
-            }
+            const macroKey = (folder: string, name: string) => JSON.stringify([folder, name])
+
+            const storedMacros = await MacroModel.find({ $or: body.map(({ folder, function: name }) => ({ folder, name })) })
+            const contentByKey = new Map(storedMacros.map((macro) => [macroKey(macro.folder, macro.name), macro.content]))
+
+            // Concatenate in request order; blocks without a stored macro contribute nothing.
+            const macros = body.map(({ folder, function: name }) => contentByKey.get(macroKey(folder, name)) ?? '').join('')
 
             return new ServiceResponse<string>(ResponseStatus.Success, 'Success', macros, StatusCodes.OK)
         } catch (ex) {
