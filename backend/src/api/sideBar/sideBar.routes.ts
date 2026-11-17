@@ -57,7 +57,7 @@ export const sideBarRouter: Router = (() => {
 
     router.get('/all', async (req: Request, res: Response) => {
         const search: string = req.query.search?.toString() || ''
-        const filter: string[] = req.query.filter?.toString().split(',') || []
+        const filter: string[] = req.query.filter?.toString().split(',').filter(Boolean) || []
         const pageType: string = req.query.pageType?.toString() || ''
 
         const controller = new SideBarController()
@@ -123,7 +123,7 @@ export const sideBarRouter: Router = (() => {
         const controller = new SideBarController()
         const paramId: string = req.params.id || 'undefined'
         const querySearch: string = req.query.search?.toString() || ''
-        const queryFilter: string[] = req.query.filter?.toString().split(',') || []
+        const queryFilter: string[] = req.query.filter?.toString().split(',').filter(Boolean) || []
 
         const serviceResponse = await controller.getTemplateSidebar(paramId, querySearch, queryFilter)
 
