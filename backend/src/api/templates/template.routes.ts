@@ -57,6 +57,9 @@ templateRegistry.register('IDefaultBlockInput', DefaultBlockInputSchema)
 
 const TemplateIdRequestSchema = z.object({ params: z.object({ id: commonValidations.templateFolder }) })
 
+const MAX_MACROS_PER_REQUEST = 100
+const MacrosRequestSchema = z.object({ body: z.array(DefaultBlockInputSchema).max(MAX_MACROS_PER_REQUEST) })
+
 export const templateController: Router = (() => {
     const router = express.Router()
 
@@ -104,7 +107,7 @@ export const templateController: Router = (() => {
         responses: createApiResponse(z.string(), 'Success'),
     })
 
-    router.post('/template/:id/macros', async (req: Request, res: Response) => {
+    router.post('/template/:id/macros', validateRequest(MacrosRequestSchema), async (req: Request, res: Response) => {
         const body: DefaultBlockInput[] = req.body as DefaultBlockInput[]
 
         const controller = new TemplateController()
