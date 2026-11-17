@@ -15,13 +15,18 @@ const CopyButton: React.FC<{
     <Button
       variant={"outline"}
       className={twMerge(className)}
-      onClick={() => {
-        navigator.clipboard.writeText(copiedText)
-        setIsCopied(true)
-        setTimeout(() => {
-          setIsCopied(false)
-        }, 2000)
-        if (onClick) onClick()
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(copiedText)
+          setIsCopied(true)
+          setTimeout(() => {
+            setIsCopied(false)
+          }, 2000)
+          if (onClick) onClick()
+        } catch (error) {
+          // Clipboard write failed (e.g., permission denied)
+          console.error("Failed to copy to clipboard:", error)
+        }
       }}
     >
       {isCopied ? (
