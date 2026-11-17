@@ -59,7 +59,7 @@ const SelectTemplateSideBar: React.FC<{
   })
 
   const sidebarOptions = useQuery({
-    queryKey: ["getV1TemplateGetAllSidebar", search],
+    queryKey: ["getV1TemplateGetAllSidebar"],
     queryFn: async () => {
       let request = await api.sidebar.getV1SidebarAllOptions()
 
