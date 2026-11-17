@@ -44,7 +44,7 @@ const GeneratorSideBar: React.FC<{
 
       return request.responseObject as IOption[]
     },
-    staleTime: 5 * 1000,
+    staleTime: Infinity, // seeded once at backend boot, static for its lifetime
   })
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const GeneratorSideBar: React.FC<{
 
       return request.responseObject as IFullTemplate[]
     },
-    staleTime: 5 * 1000,
+    staleTime: Infinity, // seeded once at backend boot, static for its lifetime
     enabled: sidebarOptions.status === "success" && !!sidebarOptions.data,
   })
 

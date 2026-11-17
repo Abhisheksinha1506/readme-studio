@@ -8,6 +8,20 @@ export const handleServiceResponse = (serviceResponse: ServiceResponse<any>, res
     return response.status(serviceResponse.statusCode).send(serviceResponse)
 }
 
+/**
+ * Marks a GET response as publicly cacheable for `seconds`.
+ *
+ * Template data is seeded once at backend boot (see db.ts's initTemplates)
+ * and only changes on redeploy, so a short cache window cuts repeat reads
+ * without risking long-lived staleness.
+ *
+ * @param seconds How long a cache may reuse the response without revalidating.
+ */
+export const cacheFor = (seconds: number) => (_req: Request, res: Response, next: NextFunction) => {
+    res.set('Cache-Control', `public, max-age=${seconds}`)
+    next()
+}
+
 export const validateRequest = (schema: ZodSchema) => (req: Request, res: Response, next: NextFunction) => {
     try {
         schema.parse({

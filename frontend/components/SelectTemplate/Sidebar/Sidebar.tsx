@@ -55,7 +55,7 @@ const SelectTemplateSideBar: React.FC<{
 
       return request.responseObject as IFullTemplate[]
     },
-    staleTime: 5 * 1000,
+    staleTime: Infinity, // seeded once at backend boot, static for its lifetime
   })
 
   const sidebarOptions = useQuery({
@@ -65,7 +65,7 @@ const SelectTemplateSideBar: React.FC<{
 
       return request.responseObject as IOption[]
     },
-    staleTime: 5 * 1000,
+    staleTime: Infinity, // seeded once at backend boot, static for its lifetime
   })
 
   // We need 3 filters

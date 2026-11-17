@@ -4,7 +4,9 @@ import { z } from 'zod'
 
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders'
 import { commonValidations } from '@/common/utils/commonValidation'
-import { handleServiceResponse, validateRequest } from '@/common/utils/httpHandlers'
+import { cacheFor, handleServiceResponse, validateRequest } from '@/common/utils/httpHandlers'
+
+const TEMPLATE_DATA_CACHE_SECONDS = 300
 
 import {
     DefaultBlockInput,
@@ -80,7 +82,7 @@ export const templateController: Router = (() => {
         responses: createApiResponse(z.array(FunctionSchema), 'Success'),
     })
 
-    router.get('/template/:id/defaultBlocks', validateRequest(TemplateIdRequestSchema), async (req: Request, res: Response) => {
+    router.get('/template/:id/defaultBlocks', validateRequest(TemplateIdRequestSchema), cacheFor(TEMPLATE_DATA_CACHE_SECONDS), async (req: Request, res: Response) => {
         const controller = new TemplateController()
         const serviceResponse = await controller.getTemplateInitialisedComponentList(req.params.id)
 
@@ -133,7 +135,7 @@ export const templateController: Router = (() => {
         responses: createApiResponse(z.string(), 'Success'),
     })
 
-    router.get('/template/:id/preview', validateRequest(TemplateIdRequestSchema), async (req: Request, res: Response) => {
+    router.get('/template/:id/preview', validateRequest(TemplateIdRequestSchema), cacheFor(TEMPLATE_DATA_CACHE_SECONDS), async (req: Request, res: Response) => {
         const controller = new TemplateController()
         const serviceResponse = await controller.getTemplatePreview(req.params.id)
 

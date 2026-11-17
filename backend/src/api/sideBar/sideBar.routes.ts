@@ -3,7 +3,9 @@ import express, { Request, Response, Router } from 'express'
 import { z } from 'zod'
 
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders'
-import { handleServiceResponse } from '@/common/utils/httpHandlers'
+import { cacheFor, handleServiceResponse } from '@/common/utils/httpHandlers'
+
+const TEMPLATE_DATA_CACHE_SECONDS = 300
 import SideBarController from './sideBar.controller'
 import { SideBarOptionsSchema, FullTemplateSchema, TemplateSchema } from '../templates/template.model'
 
@@ -55,7 +57,7 @@ export const sideBarRouter: Router = (() => {
 
     // TODO: Sort by featured as first
 
-    router.get('/all', async (req: Request, res: Response) => {
+    router.get('/all', cacheFor(TEMPLATE_DATA_CACHE_SECONDS), async (req: Request, res: Response) => {
         const search: string = req.query.search?.toString() || ''
         const filter: string[] = req.query.filter?.toString().split(',').filter(Boolean) || []
         const pageType: string = req.query.pageType?.toString() || ''
@@ -78,7 +80,7 @@ export const sideBarRouter: Router = (() => {
      * @route GET /api/sidebar
      * @desc Get all categories for all templates & page types
      */
-    router.get('/all/options', async (req: Request, res: Response) => {
+    router.get('/all/options', cacheFor(TEMPLATE_DATA_CACHE_SECONDS), async (req: Request, res: Response) => {
         const controller = new SideBarController()
         const serviceResponse = await controller.getAllSidebar()
 
@@ -119,7 +121,7 @@ export const sideBarRouter: Router = (() => {
      * @route GET /api/template/:id/sidebar
      * @desc Get a specific template by id
      */
-    router.get('/template', async (req: Request, res: Response) => {
+    router.get('/template', cacheFor(TEMPLATE_DATA_CACHE_SECONDS), async (req: Request, res: Response) => {
         const controller = new SideBarController()
         const querySearch: string = req.query.search?.toString() || ''
         const queryFilter: string[] = req.query.filter?.toString().split(',').filter(Boolean) || []
@@ -142,7 +144,7 @@ export const sideBarRouter: Router = (() => {
      * @route GET /api/template/:id/sidebar/options
      * @desc Get a specific template by id
      */
-    router.get('/template/options', async (req: Request, res: Response) => {
+    router.get('/template/options', cacheFor(TEMPLATE_DATA_CACHE_SECONDS), async (req: Request, res: Response) => {
         const controller = new SideBarController()
         const serviceResponse = await controller.getAllTemplateFolders()
 

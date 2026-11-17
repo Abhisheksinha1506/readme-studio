@@ -22,7 +22,7 @@ const PreviewModal: React.FC<{
       const request = await api.template.getV1TemplateTemplatePreview(folder)
       return request.responseObject as string
     },
-    staleTime: 5 * 1000,
+    staleTime: Infinity, // seeded once at backend boot, static for its lifetime
     enabled: modalOpen,
   })
 
