@@ -20,10 +20,10 @@ const readNjkFiles = (parentFolder: string): Macro[] | null => {
     try {
         let macros: Macro[] = [];
 
-        let macroData = fs.readFileSync(`./public/${parentFolder}/macros.json`, 'utf8');
-        macroData = JSON.parse(macroData);
+        const macroDataString = fs.readFileSync(`./public/${parentFolder}/macros.json`, 'utf8');
+        const macroData = JSON.parse(macroDataString) as Record<string, string>;
 
-        Object.keys(macroData).forEach(key => {
+        Object.keys(macroData).forEach((key: string) => {
             const macro: Macro = { folder: parentFolder, name: key, content: macroData[key] } as Macro;
             macros.push(macro);
         })
