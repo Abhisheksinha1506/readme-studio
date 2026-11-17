@@ -171,7 +171,7 @@ export const DefaultBlockInputSchema = z.object({
 
 const MongooseURLTypeSchema = {
     type: String,
-    enum: ['Facebook', 'Instagram', 'Twitter', 'Github', 'LinkedIn', 'Other'],
+    enum: URLTypeSchema.options,
 }
 
 const MongooseUserSchema = new Schema({
@@ -200,7 +200,7 @@ const MongooseFunctionSchema = new Schema({
 
 const MongoosePageTypeSchema = {
     type: String,
-    enum: ['None', 'ReadME', 'Code of Conduct', 'Privacy Policy'],
+    enum: PageTypeSchema.options,
 }
 
 const MongooseFullTemplateSchema = new Schema({
