@@ -21,31 +21,34 @@ const connectToProdDB = () => {
     }
 }
 
-const initTemplates = async () => {
-    try {
-        const templates = createTemplateObjects()
-        if (!templates) {
-            throw Error('Failed to read template data')
-        }
-        // TODO: This will cause horizontal scaling issues. We should use a unique index on the folder field instead.
-       
-        await FullTemplateModel.collection.drop().catch((err) => {})
-        await FullTemplateModel.create(templates)
-    } catch (error) {
-        console.error('Error adding templates:', error)
+/**
+ * Seeds templates and macros from ./public into MongoDB.
+ *
+ * Upserts by natural key (template `folder`, macro `folder` + `name`) and prunes entries that are
+ * no longer on disk, so collections are never emptied while other instances serve requests.
+ *
+ * @throws When seed data is missing, unreadable or cannot be written, so boot fails loudly.
+ */
+export const initTemplates = async () => {
+    const templates = createTemplateObjects()
+    if (!templates?.length) {
+        throw Error('Failed to read template data')
     }
 
-    try {
-        const macros = createMacroObjects();
-        if (!macros) {
-            throw Error('Failed to read macros data')
-        }
-        // TODO: This will cause horizontal scaling issues. We should use a unique index on the folder field instead.
-        await MacroModel.collection.drop().catch((err) => {})
-        await MacroModel.create(macros)
-    } catch (error) {
-        console.error('Error adding macros:', error)
+    const macros = createMacroObjects()
+    if (!macros?.length) {
+        throw Error('Failed to read macros data')
     }
+
+    // Production connects with autoIndex disabled, so unique indexes are built explicitly.
+    await FullTemplateModel.createIndexes()
+    await MacroModel.createIndexes()
+
+    await FullTemplateModel.bulkWrite(templates.map((template) => ({ replaceOne: { filter: { folder: template.folder }, replacement: template, upsert: true } })))
+    await FullTemplateModel.deleteMany({ folder: { $nin: templates.map((template) => template.folder) } })
+
+    await MacroModel.bulkWrite(macros.map(({ folder, name, content }) => ({ updateOne: { filter: { folder, name }, update: { $set: { content } }, upsert: true } })))
+    await MacroModel.deleteMany({ $nor: macros.map(({ folder, name }) => ({ folder, name })) })
 }
 
 export const initMongoDB = async () => {
