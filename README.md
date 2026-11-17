@@ -124,6 +124,14 @@ Please follow the following steps for successful installation:
 
      This variable is already read by `frontend/lib/apiWrapper.ts`. The generated API client lives in `frontend/openAPI/generated` and calls the backend under the `/v1` base path, so no code changes are needed.
 
+     If you instead build the frontend's Docker image, `NEXT_PUBLIC_BACKEND_URL` is a build-time `ARG`/`ENV`, baked into the client bundle at `docker build` time, not read at container start. Set it to a backend URL the user's browser can actually reach (not a Docker-internal hostname like `host.docker.internal`), and pass it with `--build-arg`:
+
+     ```sh
+     docker build --build-arg NEXT_PUBLIC_BACKEND_URL=http://localhost:8080 -t readme-studio-frontend .
+     ```
+
+     Changing the backend URL later means rebuilding the image; a new container from the old image keeps the old value.
+
 5. **Run the Backend:** Navigate to &quot;/backend&quot; directory and type the following command in your terminal to run your backend server:
 
    ```sh
