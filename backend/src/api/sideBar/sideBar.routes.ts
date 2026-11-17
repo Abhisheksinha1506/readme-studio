@@ -121,11 +121,10 @@ export const sideBarRouter: Router = (() => {
      */
     router.get('/template', async (req: Request, res: Response) => {
         const controller = new SideBarController()
-        const paramId: string = req.params.id || 'undefined'
         const querySearch: string = req.query.search?.toString() || ''
         const queryFilter: string[] = req.query.filter?.toString().split(',').filter(Boolean) || []
 
-        const serviceResponse = await controller.getTemplateSidebar(paramId, querySearch, queryFilter)
+        const serviceResponse = await controller.getTemplateSidebar(querySearch, queryFilter)
 
         handleServiceResponse(serviceResponse, res)
     })

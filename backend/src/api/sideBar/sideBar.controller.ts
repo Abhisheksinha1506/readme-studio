@@ -88,40 +88,31 @@ export default class SideBarController {
         return transformedTemplates
     }
 
-    public async getTemplateSidebar(id: string, search: string, filter: string[]): Promise<ServiceResponse<FullTemplate[] | null>> {
+    public async getTemplateSidebar(search: string, filter: string[]): Promise<ServiceResponse<FullTemplate[] | null>> {
         try {
-            if (id && id !== 'undefined') {
-                let blockData = await FullTemplateModel.findOne({ folder: id })
+            let blocksData: FullTemplate[] = await FullTemplateModel.find({})
 
-                if (!blockData) {
-                    return this.handleNullBlocksData()
-                }
-                return new ServiceResponse<FullTemplate[]>(ResponseStatus.Success, 'Success', [blockData], StatusCodes.OK)
-            } else {
-                let blocksData: FullTemplate[] = await FullTemplateModel.find({})
-
-                if (!blocksData) {
-                    return this.handleNullBlocksData()
-                }
-
-                blocksData = this.sortBlocksByFeatured(blocksData)
-
-                // search goes through all templates and filters by function.name and function.description
-                // Only show that block if it has a function that matches the search and not the other related ones
-
-                if (search.length) {
-                    blocksData = this.findTemplateWithFunction(blocksData, search)
-                }
-
-                // filter by template (folder name)
-                if (filter.length) {
-                    blocksData = blocksData.filter((block: FullTemplate) => {
-                        return filter.includes(block.folder)
-                    })
-                }
-
-                return new ServiceResponse<FullTemplate[]>(ResponseStatus.Success, 'Success', blocksData, StatusCodes.OK)
+            if (!blocksData) {
+                return this.handleNullBlocksData()
             }
+
+            blocksData = this.sortBlocksByFeatured(blocksData)
+
+            // search goes through all templates and filters by function.name and function.description
+            // Only show that block if it has a function that matches the search and not the other related ones
+
+            if (search.length) {
+                blocksData = this.findTemplateWithFunction(blocksData, search)
+            }
+
+            // filter by template (folder name)
+            if (filter.length) {
+                blocksData = blocksData.filter((block: FullTemplate) => {
+                    return filter.includes(block.folder)
+                })
+            }
+
+            return new ServiceResponse<FullTemplate[]>(ResponseStatus.Success, 'Success', blocksData, StatusCodes.OK)
         } catch (ex) {
             return new ServiceResponse(ResponseStatus.Failed, 'Failed to get template', null, StatusCodes.INTERNAL_SERVER_ERROR)
         }
