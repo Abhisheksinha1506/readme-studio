@@ -23,7 +23,6 @@ const MainContent: React.FC<{
   templateBlocks: IFunction[]
   setTemplateBlocks: React.Dispatch<React.SetStateAction<IFunction[]>>
 }> = ({ templateId, templateBlocks, setTemplateBlocks }) => {
-  const [macros, setMacros] = useState<string>("")
   const [variables, setVariables] = useState<Record<string, any>>({})
   const [debouncedVariables] = useDebounce(variables, COMPILE_DEBOUNCE_MS)
   const [output, setOutput] = useState<string>("")
@@ -49,51 +48,28 @@ const MainContent: React.FC<{
     }
   }, [populateTemplateData.data, populateTemplateData.status])
 
-  const populateMacrosData = useQuery({
-    queryKey: ["postV1TemplateTemplateMacros", templateBlocks],
+  // Rendering runs on the backend, which resolves each block's macro content
+  // itself from (folder, function) identifiers rather than trusting template
+  // source from the client. debouncedVariables is what keeps a request from
+  // firing on every keystroke, same debounce window as before the move.
+  const compileOutput = useQuery({
+    queryKey: ["postV1TemplateCompile", templateBlocks, debouncedVariables],
     queryFn: async () => {
-      const blocksMapped: IDefaultBlockInput[] = templateBlocks.map(
+      const blocks: IDefaultBlockInput[] = templateBlocks.map(
         (block: IFunction) => ({
           function: block.function,
           folder: block.folder,
         })
       )
 
-      let request = await api.template.postV1TemplateTemplateMacros(
-        blocksMapped
-      )
-
-      return request.responseObject as string
-    },
-    // Depends on the chosen blocks only, so blocks added without a template still load their macros.
-    enabled: templateBlocks.length > 0,
-    // Macro content for a given set of blocks is static for the backend's lifetime.
-    staleTime: Infinity,
-  })
-
-  useEffect(() => {
-    if (populateMacrosData.status === "success") {
-      setMacros(populateMacrosData.data!)
-    }
-  }, [populateMacrosData.data, populateMacrosData.status])
-
-  // Rendering runs on the backend; debouncedVariables is what keeps a request
-  // from firing on every keystroke, same debounce window as before the move.
-  const compileOutput = useQuery({
-    queryKey: ["postV1TemplateCompile", macros, templateBlocks, debouncedVariables],
-    queryFn: async () => {
       const request = await api.template.postV1TemplateCompile({
-        macros,
-        templateBlocks,
+        blocks,
         variables: debouncedVariables,
       })
 
       return request.responseObject as string
     },
-    enabled:
-      Boolean(macros) &&
-      templateBlocks.length > 0 &&
-      templateBlocks.every((block) => macros.includes(block.function)),
+    enabled: templateBlocks.length > 0,
   })
 
   useEffect(() => {

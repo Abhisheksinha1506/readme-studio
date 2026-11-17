@@ -169,8 +169,11 @@ export const DefaultBlockInputSchema = z.object({
 export type CompileTemplateInput = z.infer<typeof CompileTemplateInputSchema>
 
 export const CompileTemplateInputSchema = z.object({
-    macros: z.string(),
-    templateBlocks: z.array(FunctionSchema),
+    // Selected blocks, in render order. Resolved against the database, same
+    // (folder, function) pairs the /macros endpoint already accepts — never
+    // the macro/function/variable-name text itself, which would let a client
+    // inject arbitrary Nunjucks template source. See compileTemplate.ts.
+    blocks: z.array(DefaultBlockInputSchema),
     variables: z.record(z.string(), z.unknown()),
 })
 

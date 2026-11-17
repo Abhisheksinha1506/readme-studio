@@ -6,6 +6,18 @@
  * MainContent/generator.ts), compiled client-side via nunjucks/browser.
  * It's promoted here so the backend can render on the user's behalf
  * instead, with one implementation instead of two that could drift apart.
+ *
+ * SECURITY: `macros` and every `function`/variable `name` in `templateBlocks`
+ * are concatenated directly into Nunjucks template source and executed by
+ * nunjucks.renderString. Nunjucks has no sandbox: template source is
+ * effectively arbitrary code. The client-side version was safe because it
+ * ran in the user's own browser against their own input (self-XSS at worst).
+ * On the server, these three inputs MUST come only from a template's
+ * committed blocks.json/macros.json (via Mongo), never from request input —
+ * see TemplateController.compileTemplate, the only production caller, which
+ * resolves them from the database before calling compileString. Variable
+ * *values* are safe to take from the client: they're passed as the render
+ * context object, never parsed as template source.
  */
 
 import nunjucks from 'nunjucks'
@@ -29,17 +41,15 @@ export const combineMacroIntoOrderedFunctionString = (blocks: CompileTemplateBlo
         })
         .join(' ')
 
-export const mapVariableObjectToString = (variables: Record<string, unknown>): string => {
-    let variablesString = ''
-    Object.keys(variables).forEach((element: string) => {
-        variablesString += `{%- set ${element} = ${JSON.stringify(variables[element])} -%} `
-    })
-    return variablesString
-}
-
 /**
  * Renders a README from already-fetched macro definitions, the ordered list
  * of selected blocks, and the current value of every variable.
+ *
+ * `macros` and every block's `function`/variable `name` must be trusted
+ * (DB-sourced) identifiers, not request input — see the security note above.
+ * `variables` is passed as the Nunjucks render context, so its keys and
+ * values are never parsed as template source and may safely come from the
+ * client.
  *
  * @param macros Concatenated Nunjucks macro definitions for the selected blocks.
  * @param templateBlocks The selected blocks, in render order.
@@ -49,10 +59,8 @@ export const mapVariableObjectToString = (variables: Record<string, unknown>): s
 export const compileString = (macros: string, templateBlocks: CompileTemplateBlock[], variables: Record<string, unknown>): string => {
     nunjucks.configure({ autoescape: false, lstripBlocks: true })
 
-    const specificTemplate = macros
     const index = combineMacroIntoOrderedFunctionString(templateBlocks)
-    const variableString = mapVariableObjectToString(variables)
+    const string = `${macros} ${index}`
 
-    const string = `${variableString} ${specificTemplate} ${index}`
-    return nunjucks.renderString(string, {})
+    return nunjucks.renderString(string, variables)
 }

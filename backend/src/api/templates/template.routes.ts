@@ -67,7 +67,7 @@ const MacrosRequestSchema = z.object({ body: z.array(DefaultBlockInputSchema).ma
 
 const CompileRequestSchema = z.object({
     body: CompileTemplateInputSchema.extend({
-        templateBlocks: CompileTemplateInputSchema.shape.templateBlocks.max(MAX_MACROS_PER_REQUEST),
+        blocks: CompileTemplateInputSchema.shape.blocks.max(MAX_MACROS_PER_REQUEST),
     }),
 })
 

@@ -21,11 +21,16 @@ const template = 'othneildrew-best-readme-template'
 
 const readJson = <T>(filePath: string): T => JSON.parse(fs.readFileSync(filePath, 'utf8')) as T
 
+const compile = (body: unknown) =>
+    fetch(`${baseUrl}/v1/template/compile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    })
+
 test('POST /v1/template/compile renders the same output as the backend render pipeline for default values', async () => {
     const blocks = readJson<TemplateBlocks>(path.join(PUBLIC_DIR, template, 'blocks.json'))
-    const macrosByFunction = readJson<Record<string, string>>(path.join(PUBLIC_DIR, template, 'macros.json'))
     const orderedBlocks = orderedStartupBlocks(blocks)
-    const macros = orderedBlocks.map((block) => macrosByFunction[block.function] ?? '').join('')
     const variables: Record<string, unknown> = {}
     for (const block of orderedBlocks) {
         for (const variable of block.variables) {
@@ -33,10 +38,9 @@ test('POST /v1/template/compile renders the same output as the backend render pi
         }
     }
 
-    const response = await fetch(`${baseUrl}/v1/template/compile`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ macros, templateBlocks: orderedBlocks, variables }),
+    const response = await compile({
+        blocks: orderedBlocks.map((block) => ({ folder: template, function: block.function })),
+        variables,
     })
     const body = await response.json()
 
@@ -46,35 +50,65 @@ test('POST /v1/template/compile renders the same output as the backend render pi
 })
 
 test('POST /v1/template/compile reflects a changed variable value', async () => {
-    const response = await fetch(`${baseUrl}/v1/template/compile`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            macros: '{% macro greetMacro() %}{{ greeting }}{% endmacro %}',
-            templateBlocks: [
-                {
-                    name: 'Greeting',
-                    description: 'A greeting',
-                    function: 'greetMacro',
-                    folder: template,
-                    variables: [{ label: 'Greeting', name: 'greeting', defaultValue: 'Hello', _type: 'input' }],
-                },
-            ],
-            variables: { greeting: 'Hello, World!' },
-        }),
+    // "Project Header" / "Headline" on othneildrew-best-readme-template.
+    const headerFunction = 'e6b713de25115592b32addc6f6e6fba7'
+    const headlineVariable = '79cff063dce85a38a0d0bdd27864f465'
+
+    const response = await compile({
+        blocks: [{ folder: template, function: headerFunction }],
+        variables: { [headlineVariable]: 'Hello, World!' },
     })
     const body = await response.json()
 
     assert.equal(response.status, 200)
-    assert.equal(body.responseObject.trim(), 'Hello, World!')
+    assert.match(body.responseObject, /Hello, World!/)
+})
+
+test('POST /v1/template/compile rejects an unknown (folder, function) pair', async () => {
+    const response = await compile({
+        blocks: [{ folder: template, function: 'does-not-exist' }],
+        variables: {},
+    })
+    const body = await response.json()
+
+    assert.equal(response.status, 400)
+    assert.match(body.message, /Unknown block/)
 })
 
 test('POST /v1/template/compile rejects a malformed body', async () => {
-    const response = await fetch(`${baseUrl}/v1/template/compile`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ macros: 'x' }),
-    })
+    const response = await compile({ blocks: 'not-an-array' })
 
     assert.equal(response.status, 400)
+})
+
+test('POST /v1/template/compile does not execute Nunjucks source smuggled through a variable value', async () => {
+    const headerFunction = 'e6b713de25115592b32addc6f6e6fba7'
+    const headlineVariable = '79cff063dce85a38a0d0bdd27864f465'
+    const payload = '{{ 7 * 7 }}'
+
+    const response = await compile({
+        blocks: [{ folder: template, function: headerFunction }],
+        variables: { [headlineVariable]: payload },
+    })
+    const body = await response.json()
+
+    assert.equal(response.status, 200)
+    // The payload must appear verbatim, not evaluated to "49": variable values
+    // are bound as the Nunjucks render context, never parsed as template source.
+    assert.match(body.responseObject, /\{\{ 7 \* 7 \}\}/)
+    assert.doesNotMatch(body.responseObject, /(?<!\{)\b49\b/)
+})
+
+test('POST /v1/template/compile cannot smuggle template source through the block/function identifier', async () => {
+    // Only a (folder, function) pair that resolves against the database is
+    // ever used to build template source; arbitrary function-name strings are
+    // rejected outright rather than being concatenated into it.
+    const response = await compile({
+        blocks: [{ folder: template, function: '{{ 7 * 7 }}' }],
+        variables: {},
+    })
+    const body = await response.json()
+
+    assert.equal(response.status, 400)
+    assert.match(body.message, /Unknown block/)
 })

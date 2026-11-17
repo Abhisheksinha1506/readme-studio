@@ -70,7 +70,39 @@ export default class TemplateController {
 
     public async compileTemplate(input: CompileTemplateInput): Promise<ServiceResponse<string | null>> {
         try {
-            const rendered = compileString(input.macros, input.templateBlocks, input.variables)
+            if (!input.blocks.length) {
+                return new ServiceResponse<string>(ResponseStatus.Success, 'Success', '', StatusCodes.OK)
+            }
+
+            // Resolve every (folder, function) pair against the database: the
+            // macro text and every function/variable name compileString sees
+            // must be trusted, DB-sourced identifiers, never request input.
+            // See the security note on compileString.
+            const folders = [...new Set(input.blocks.map(({ folder }) => folder))]
+            const templates = await FullTemplateModel.find({ folder: { $in: folders } })
+
+            const blockKey = (folder: string, name: string) => JSON.stringify([folder, name])
+            const functionByKey = new Map<string, IFunction>()
+            for (const template of templates) {
+                for (const func of template.functions) {
+                    functionByKey.set(blockKey(template.folder, func.function), func)
+                }
+            }
+
+            const orderedBlocks: IFunction[] = []
+            for (const { folder, function: name } of input.blocks) {
+                const func = functionByKey.get(blockKey(folder, name))
+                if (!func) {
+                    return new ServiceResponse(ResponseStatus.Failed, `Unknown block: ${folder}/${name}`, null, StatusCodes.BAD_REQUEST)
+                }
+                orderedBlocks.push(func)
+            }
+
+            const storedMacros = await MacroModel.find({ $or: input.blocks.map(({ folder, function: name }) => ({ folder, name })) })
+            const macroContentByKey = new Map(storedMacros.map((macro) => [blockKey(macro.folder, macro.name), macro.content]))
+            const macros = input.blocks.map(({ folder, function: name }) => macroContentByKey.get(blockKey(folder, name)) ?? '').join('')
+
+            const rendered = compileString(macros, orderedBlocks, input.variables)
 
             return new ServiceResponse<string>(ResponseStatus.Success, 'Success', rendered, StatusCodes.OK)
         } catch (ex) {
