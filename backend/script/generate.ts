@@ -81,6 +81,20 @@ const generateBlockJSON = async (directoryPath: string): Promise<Map<string, str
     return variableToUUIDMap
 }
 
+export function escapeRegExp(string: string): string {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+export function replaceVariablesWithWordBoundaries(content: string, variableToUUIDMap: Map<string, string>): string {
+    let data = content
+    Array.from(variableToUUIDMap).forEach(([key, value]) => {
+        const escapedKey = escapeRegExp(key)
+        data = data.replace(new RegExp(`\\b${escapedKey}\\b`, 'g'), value)
+        console.log('replacing', key, value)
+    })
+    return data
+}
+
 function generateMacroJSON(directoryUrl: string, variableToUUIDMap: Map<string, string>): void {
     const macrosDirectory = path.join(directoryUrl, 'macros')
 
@@ -92,11 +106,7 @@ function generateMacroJSON(directoryUrl: string, variableToUUIDMap: Map<string, 
         if (fs.lstatSync(filePath).isFile()) {
             let data = fs.readFileSync(filePath, { encoding: 'utf8' })
 
-            //  foreach ofthis hashmap
-            Array.from(variableToUUIDMap).forEach(([key, value]) => {
-                data = data.replace(new RegExp(key, 'g'), value)
-                console.log('replacing', key, value)
-            })
+            data = replaceVariablesWithWordBoundaries(data, variableToUUIDMap)
 
             result[variableToUUIDMap.get(file.replace('.njk', ''))!] = data
         }
@@ -108,4 +118,6 @@ function generateMacroJSON(directoryUrl: string, variableToUUIDMap: Map<string, 
 }
 
 const rootDirectory: string = path.join(__dirname, '..')
-readDirectoriesAndConvertToJSON(rootDirectory)
+if (require.main === module) {
+    readDirectoriesAndConvertToJSON(rootDirectory)
+}
