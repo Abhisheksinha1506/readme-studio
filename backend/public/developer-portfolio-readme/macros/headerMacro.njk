@@ -1,0 +1,11 @@
+{% macro headerMacro() %}
+<div align="center">
+{% if headerAvatar.url %}<img src="{{ headerAvatar.url }}" alt="{{ headerAvatar.altTag }}" width="120" height="120" style="border-radius:50%"/>{% endif %}{% if headerName %}
+
+### {{ headerName }}{% endif %}{% if headerTitle %}
+{{ headerTitle }}{% endif %}{% if socialLinkList|length %}
+
+{% for item in socialLinkList %}{% if item.name|length and item.url|length %}[{{ item.name }}]({{ item.url }}){% if not loop.last %} · {% endif %}{% endif %}{% endfor %}{% endif %}
+
+</div>
+{% endmacro %}

@@ -1,0 +1,10 @@
+{% macro projectsMacro() %}{% if projectsList|length %}
+## Projects
+
+{% for item in projectsList %}{% if item.name|length %}### [{{ item.name }}]({{ item.url }})
+
+{{ item.description }}
+
+{% endif %}{% endfor %}
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,7 @@
+{% macro headerMacro() %}{% if headerPackageName %}
+# {{ headerPackageName }}{% endif %}{% if badgeList|length %}
+{% for item in badgeList %}{% if item.altTag|length and item.url|length %}
+![{{ item.altTag }}]({{ item.url }}){% endif %}{% endfor %}{% endif %}{% if headerPitch %}
+
+{{ headerPitch }}{% endif %}
+{% endmacro %}
