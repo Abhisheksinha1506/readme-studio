@@ -9,16 +9,27 @@ export const handleServiceResponse = (serviceResponse: ServiceResponse<any>, res
 }
 
 /**
- * Marks a GET response as publicly cacheable for `seconds`.
+ * Marks a successful GET response as publicly cacheable for `seconds`.
  *
  * Template data is seeded once at backend boot (see db.ts's initTemplates)
  * and only changes on redeploy, so a short cache window cuts repeat reads
  * without risking long-lived staleness.
  *
+ * Only applies the header once the status code is known to be 2xx: the
+ * route's status isn't set until the handler runs, so the header is attached
+ * by wrapping `send` rather than set upfront, which would also mark error
+ * responses (404, 500) as cacheable.
+ *
  * @param seconds How long a cache may reuse the response without revalidating.
  */
 export const cacheFor = (seconds: number) => (_req: Request, res: Response, next: NextFunction) => {
-    res.set('Cache-Control', `public, max-age=${seconds}`)
+    const originalSend = res.send.bind(res)
+    res.send = ((body?: unknown) => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+            res.set('Cache-Control', `public, max-age=${seconds}`)
+        }
+        return originalSend(body)
+    }) as Response['send']
     next()
 }
 
