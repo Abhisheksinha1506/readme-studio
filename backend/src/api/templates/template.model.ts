@@ -171,7 +171,7 @@ export const DefaultBlockInputSchema = z.object({
 
 const MongooseURLTypeSchema = {
     type: String,
-    enum: ['Facebook', 'Instagram', 'Twitter', 'Github', 'LinkedIn', 'Other'],
+    enum: URLTypeSchema.options,
 }
 
 const MongooseUserSchema = new Schema({
@@ -200,7 +200,7 @@ const MongooseFunctionSchema = new Schema({
 
 const MongoosePageTypeSchema = {
     type: String,
-    enum: ['None', 'ReadME', 'Code of Conduct', 'Privacy Policy'],
+    enum: PageTypeSchema.options,
 }
 
 const MongooseFullTemplateSchema = new Schema({
@@ -218,6 +218,7 @@ const MongooseFullTemplateSchema = new Schema({
     pageType: MongoosePageTypeSchema,
     functions: [MongooseFunctionSchema],
 })
+MongooseFullTemplateSchema.index({ folder: 1 }, { unique: true })
 
 // Macros ///////////////////////////////////////////////////////////////
 
@@ -232,6 +233,7 @@ const macroSchema = new Schema({
     name: { type: String, required: true },
     content: { type: String, required: true },
   });
+macroSchema.index({ folder: 1, name: 1 }, { unique: true })
   
 
 export const FullTemplateModel = mongoose.model<FullTemplate>('FullTemplate', MongooseFullTemplateSchema)

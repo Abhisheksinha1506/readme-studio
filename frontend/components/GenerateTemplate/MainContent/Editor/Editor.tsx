@@ -36,10 +36,7 @@ const Editor = ({
   return (
     <div className="grid grid-cols-1 gap-6 p-6 xl:w-full">
       <FormProvider {...methods}>
-        <form
-          onChange={handleSubmit(onSubmit)}
-          onSubmit={(e) => e.preventDefault()}
-        >
+        <form onSubmit={(e) => e.preventDefault()}>
           <Reorder.Group
             className="grid grid-cols-1 gap-6"
             axis="y"
@@ -50,7 +47,7 @@ const Editor = ({
               <EditorBlock
                 block={block}
                 deleteBlock={() => deleteBlock(index)}
-                key={block.name}
+                key={block.function}
                 control={control}
               />
             ))}

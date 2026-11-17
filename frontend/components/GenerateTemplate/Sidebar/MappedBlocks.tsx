@@ -26,10 +26,10 @@ const MappedBlocks: React.FC<{
       {blocks.map((block: IFullTemplate, index: number) => {
         return (
           <Collapsible
-            open={open[index]}
+            open={open[index] ?? true}
             onOpenChange={() => {
               let temp = [...open]
-              temp[index] = !temp[index]
+              temp[index] = !(open[index] ?? true)
               setOpen(temp)
             }}
             key={index}

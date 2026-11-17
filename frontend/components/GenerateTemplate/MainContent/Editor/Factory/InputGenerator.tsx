@@ -8,7 +8,7 @@ import {
   IVariableSelect,
   IVariableTextArea,
 } from "@/openAPI/generated"
-import { Control, useFieldArray } from "react-hook-form"
+import { Control } from "react-hook-form"
 
 import CheckBoxField from "./CheckboxField"
 import InputField from "./InputField"
@@ -32,11 +32,6 @@ const InputGenerator: React.FC<{
   // register: UseFormRegister<any>
   control: Control<any>
 }> = ({ variables, control }) => {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: variables.name,
-  })
-
   switch (variables._type) {
     case "input":
       return <InputField variables={variables} control={control} />

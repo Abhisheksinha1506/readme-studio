@@ -2,7 +2,7 @@ const rimraf = require("rimraf")
 const OpenAPI = require("openapi-typescript-codegen")
 
 const generate = async () => {
-  await rimraf.rimraf("./src/openAPI/generated")
+  await rimraf.rimraf("./openAPI/generated")
 
   await OpenAPI.generate({
     exportCore: true,
