@@ -19,11 +19,10 @@ export default class TemplateController {
 
             const indexData: string[] = blockData.startupBlocks
 
-            const functions: IFunction[] = blockData.functions.map((block: IFunction) => {
-                if (indexData.includes(block.function)) {
-                    return block
-                }
-            })
+            // Resolve in startupBlocks order and skip names that have no matching block.
+            const functions: IFunction[] = indexData
+                .map((blockName: string) => blockData.functions.find((block: IFunction) => block.function === blockName))
+                .filter((block): block is IFunction => block !== undefined)
 
             return new ServiceResponse<IFunction[]>(ResponseStatus.Success, 'Success', functions, StatusCodes.OK)
         } catch (ex) {
