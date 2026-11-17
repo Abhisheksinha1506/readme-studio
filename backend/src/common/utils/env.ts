@@ -1,7 +1,11 @@
 import dotenv from 'dotenv'
 import fs from 'fs'
 
-if (process.env.NODE_ENV === 'prod') {
+// Both the project's short names and the conventional long names are accepted.
+const PRODUCTION_VALUES = ['prod', 'production']
+const DEVELOPMENT_VALUES = ['dev', 'development']
+
+if (PRODUCTION_VALUES.includes(process.env.NODE_ENV ?? '')) {
     console.log('Production environment detected, skipping dotenv configuration')
 } else if (fs.existsSync('.env')) {
     dotenv.config({ path: '.env' })
@@ -22,6 +26,8 @@ const NODE_ENV = process.env.NODE_ENV!
 
 if (!NODE_ENV) {
     listOfErrorMessages.push('No NODE_ENV set')
+} else if (![...PRODUCTION_VALUES, ...DEVELOPMENT_VALUES].includes(NODE_ENV)) {
+    listOfErrorMessages.push(`Unknown NODE_ENV "${NODE_ENV}", expected one of: ${[...PRODUCTION_VALUES, ...DEVELOPMENT_VALUES].join(', ')}`)
 }
 
 export enum Environment {
@@ -29,7 +35,7 @@ export enum Environment {
     DEVELOPMENT = 'dev',
 }
 
-export const PRODUCTION_OR_DEVELOPMENT: Environment = NODE_ENV === 'prod' ? Environment.PRODUCTION : Environment.DEVELOPMENT
+export const PRODUCTION_OR_DEVELOPMENT: Environment = PRODUCTION_VALUES.includes(NODE_ENV) ? Environment.PRODUCTION : Environment.DEVELOPMENT
 
 export const PORT = process.env.PORT!
 
