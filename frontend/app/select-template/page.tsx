@@ -90,7 +90,9 @@ const CardGridState = ({
   template: ITemplate[]
 }) => {
   const addCategoryToSidebar = (value: string) => {
-    setMultiSelectValue([...multiSelectValue, value])
+    if (!multiSelectValue.includes(value)) {
+      setMultiSelectValue([...multiSelectValue, value])
+    }
   }
 
   if (isLoading) {
