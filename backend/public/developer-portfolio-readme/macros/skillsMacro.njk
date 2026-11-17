@@ -1,0 +1,7 @@
+{% macro skillsMacro() %}{% if skillsList|length %}
+## Skills
+
+{% for item in skillsList %}{% if item.name|length %}- {{ item.name }}
+{% endif %}{% endfor %}
+{% endif %}
+{% endmacro %}

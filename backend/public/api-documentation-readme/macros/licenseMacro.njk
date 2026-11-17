@@ -1,0 +1,6 @@
+{% macro licenseMacro() %}{% if licenseName %}
+## License
+
+[{{ licenseName }}]({{ licenseUrl }})
+{% endif %}
+{% endmacro %}

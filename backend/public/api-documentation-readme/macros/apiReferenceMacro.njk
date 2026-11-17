@@ -1,0 +1,10 @@
+{% macro apiReferenceMacro() %}{% if apiEntryList|length %}
+## API Reference
+
+{% for item in apiEntryList %}{% if item.signature|length %}### `{{ item.signature }}`
+
+{{ item.description }}
+
+{% endif %}{% endfor %}
+{% endif %}
+{% endmacro %}
