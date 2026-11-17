@@ -15,7 +15,7 @@ const TopThreeTemplates = () => {
 
       return request.responseObject?.slice(0, 3) as IFullTemplate[]
     },
-    staleTime: 5 * 1000,
+    staleTime: Infinity, // seeded once at backend boot, static for its lifetime
   })
 
   if (templateMaps.data && templateMaps.isSuccess) {

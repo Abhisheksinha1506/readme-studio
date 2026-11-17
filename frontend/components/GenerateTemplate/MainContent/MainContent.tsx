@@ -40,6 +40,8 @@ const MainContent: React.FC<{
     },
     // "/generator" has no template to load: the user starts from an empty block list.
     enabled: templateId !== "undefined",
+    // Templates are seeded once at backend boot and never change at runtime.
+    staleTime: Infinity,
   })
 
   useEffect(() => {
@@ -66,6 +68,8 @@ const MainContent: React.FC<{
     },
     // Depends on the chosen blocks only, so blocks added without a template still load their macros.
     enabled: templateBlocks.length > 0,
+    // Macro content for a given set of blocks is static for the backend's lifetime.
+    staleTime: Infinity,
   })
 
   useEffect(() => {
