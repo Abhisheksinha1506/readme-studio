@@ -12,10 +12,6 @@ import { contributorController } from './api/contributors/contributor.routes'
 import { openAPIRouter } from './api-docs/openAPIRouter'
 import errorHandler from './common/middleware/errorHandler'
 import { PORT } from './common/utils/env'
-import { initMongoDB } from './db'
-
-// Initialise database
-initMongoDB()
 
 // Create Express server
 const app: Express = express()
