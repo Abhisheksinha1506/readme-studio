@@ -50,7 +50,7 @@ const Editor = ({
               <EditorBlock
                 block={block}
                 deleteBlock={() => deleteBlock(index)}
-                key={block.name}
+                key={block.function}
                 control={control}
               />
             ))}
