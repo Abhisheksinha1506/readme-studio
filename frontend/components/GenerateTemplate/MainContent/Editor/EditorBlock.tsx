@@ -5,6 +5,7 @@ import { GripVertical, Trash2Icon } from "lucide-react"
 import { Control, FieldValues } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import {
   Card,
   CardContent,
@@ -46,9 +47,10 @@ const EditorBlock = ({
     >
       <Card
         id="editor-block"
-        className={`p-4 transition-transform duration-300${
+        className={cn(
+          "p-4 transition-transform duration-300",
           isMinimized && "hover:scale-[1.02]"
-        }`}
+        )}
       >
         <CardHeader>
           <div className="flex items-start justify-between gap-6">
