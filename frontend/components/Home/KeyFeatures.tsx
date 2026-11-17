@@ -1,96 +1,102 @@
 "use client"
 
 import React from "react"
-import Image from "next/image"
 import { motion } from "framer-motion"
+import {
+  Download,
+  Eye,
+  type LucideIcon,
+  LayoutTemplate,
+  MousePointerClick,
+  SlidersHorizontal,
+  Users,
+} from "lucide-react"
 
 import { siteConfig } from "@/config/site"
 
+// Thin-stroke line icons replace the old filled cyan illustrations, which
+// only read against a dark ground. Mapped by feature order.
+const FEATURE_ICONS = [
+  LayoutTemplate,
+  SlidersHorizontal,
+  MousePointerClick,
+  Eye,
+  Download,
+  Users,
+]
+
 const KeyFeatures = () => {
   return (
-    <div className="relative my-5">
-      <div>
-        <div className="mb-12 text-center">
-          <h2 className="font-semibold text-themeGreen">Features</h2>
-          <h1 className="text-6xl font-bold text-white">Key Features</h1>
-        </div>
-
-        <motion.div
-          className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
-          initial="hidden"
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.5 }}
-          whileInView="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                delayChildren: 0.3,
-                staggerChildren: 0.2,
-              },
-            },
-          }}
-        >
-          {siteConfig.homePage.keyFeatures.map(
-            (feature: IFeatureGridElement, index: number) => {
-              return (
-                <motion.div
-                  key={index}
-                  variants={{
-                    hidden: { y: 20, opacity: 0 },
-                    visible: {
-                      y: 0,
-                      opacity: 1,
-                    },
-                  }}
-                >
-                  <FeatureGridElement
-                    image={feature.image}
-                    title={feature.title}
-                    description={feature.description}
-                    key={index}
-                  />
-                </motion.div>
-              )
-            }
-          )}
-        </motion.div>
+    <div className="relative my-20">
+      <div className="mb-10 text-center">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+          Features
+        </p>
+        <h2 className="mt-2 font-display text-4xl font-semibold text-foreground md:text-5xl">
+          What&apos;s in the case
+        </h2>
       </div>
-      <div
-        className="absolute left-[50%]
-          top-[50%] z-[-1] size-[75%] translate-x-[-50%] translate-y-[-50%] rounded-[780px] bg-themeGreen opacity-45 blur-[350px]"
-      ></div>
+
+      <motion.div
+        className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+        initial="hidden"
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.5 }}
+        whileInView="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              delayChildren: 0.3,
+              staggerChildren: 0.15,
+            },
+          },
+        }}
+      >
+        {siteConfig.homePage.keyFeatures.map(
+          (
+            feature: { image: string; title: string; description: string },
+            index: number
+          ) => (
+            <motion.div
+              key={index}
+              variants={{
+                hidden: { y: 16, opacity: 0 },
+                visible: { y: 0, opacity: 1 },
+              }}
+            >
+              <FeatureGridElement
+                Icon={FEATURE_ICONS[index] ?? LayoutTemplate}
+                title={feature.title}
+                description={feature.description}
+              />
+            </motion.div>
+          )
+        )}
+      </motion.div>
     </div>
   )
 }
 
 interface IFeatureGridElement {
-  image: string
+  Icon: LucideIcon
   title: string
   description: string
 }
 
 const FeatureGridElement: React.FC<IFeatureGridElement> = ({
-  image,
+  Icon,
   title,
   description,
 }) => {
   return (
-    <div className="rounded-[30px] bg-white bg-opacity-[0.08] p-8">
-      <div>
-        <Image
-          className="mb-4 h-auto w-[60px]"
-          src={image}
-          alt={title}
-          width={100}
-          height={100}
-        />
-      </div>
-      <h3 className="font-poppins mb-4 text-base font-semibold text-homeBlue">
+    <div className="h-full rounded-sm border border-border bg-card p-6">
+      <Icon className="mb-4 size-8 text-primary" strokeWidth={1.5} />
+      <h3 className="mb-2 font-display text-lg font-semibold text-foreground">
         {title}
       </h3>
-      <p className="tex-twhite font-poppins mb-4 text-sm font-light leading-[175%]">
+      <p className="text-sm leading-relaxed text-muted-foreground">
         {description}
       </p>
     </div>

@@ -79,12 +79,12 @@ export const siteConfig = {
   },
   homePage: {
     splashScreen: {
-      title: "Empowering Project Documentation",
-      subtitle: "Welcome to makeread.me",
+      title: "Set your README like type",
+      subtitle: "makeread.me",
       description:
-        "Elevate your project presentations with captivating ReadME files. Our intuitive ReadME Generator makes creating professional documentation a breeze, whether you're a beginner or an experienced developer. Choose from our extensive collection of customizable templates and streamline your workflow. Experience the simplicity and effectiveness of makeread.me - the ultimate tool to enhance your projects.",
+        "Pick a block, not a blank page. Every section — header, installation, license, acknowledgments — is an independent piece you compose, mix across templates, and proof live before you pull it.",
       cta: {
-        title: "Start Generating ReadMEs Now!",
+        title: "Start Composing",
         href: "/select-template",
       },
     },

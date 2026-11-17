@@ -24,19 +24,23 @@ const FeedbackPopup = () => {
   return (
     <>
       {isOpen && (
-        <div className="fixed bottom-4 right-4 z-50 w-full max-w-[300px] rounded-lg bg-primary p-4 text-primary-foreground shadow-lg">
+        <div className="fixed bottom-4 right-4 z-50 w-full max-w-[300px] rounded-sm border border-ink/15 bg-paper p-4 text-ink shadow-[4px_4px_0_0_hsl(var(--ink)/0.7)]">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-1">
               <p className="text-sm font-medium">
                 Have a complaint or want to help develop our app?
               </p>
-              <p className="text-sm">
+              <p className="text-sm text-ink/70">
                 Please raise a report on our GitHub repository.
               </p>
             </div>
-            <Button size="icon" onClick={handleClose}>
+            <button
+              onClick={handleClose}
+              aria-label="Dismiss"
+              className="shrink-0 text-ink/50 hover:text-ink"
+            >
               <XIcon className="size-4" />
-            </Button>
+            </button>
           </div>
           <div className="mt-4">
             <Link

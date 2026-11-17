@@ -8,29 +8,33 @@ import { siteConfig } from "@/config/site"
 const Demo = () => {
   return (
     <div className="relative my-24 w-full">
-      <div className="mb-12 text-center">
-        <h2 className="font-semibold text-themeGreen">How the app works</h2>
-        <h1 className="text-6xl font-bold text-white">Preview</h1>
+      <div className="mb-10 text-center">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+          How it works
+        </p>
+        <h2 className="mt-2 font-display text-4xl font-semibold text-foreground md:text-5xl">
+          The proof
+        </h2>
       </div>
       <motion.div
-        className="flex w-full items-center justify-center"
+        className="relative flex w-full items-center justify-center"
         viewport={{ once: true, amount: 0.5 }}
-        initial={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.5 }}
-        whileInView={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, y: 16 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        whileInView={{ opacity: 1, y: 0 }}
       >
-        <Image
-          className="h-full rounded-[36px] border-[6px] border-white/15 shadow-2xl shadow-black lg:w-3/4"
-          width={1920}
-          height={1080}
-          src={siteConfig.homePage.demo}
-          alt="Demo"
-        />
+        <div className="relative rounded-sm border border-ink/15 bg-paper p-2 shadow-[8px_8px_0_0_hsl(var(--ink)/0.85)] dark:shadow-[8px_8px_0_0_hsl(var(--paper)/0.5)] lg:w-3/4">
+          <span className="register-mark absolute left-3 top-3 text-ink/30" aria-hidden />
+          <span className="register-mark absolute bottom-3 right-3 text-ink/30" aria-hidden />
+          <Image
+            className="rounded-[1px]"
+            width={1920}
+            height={1080}
+            src={siteConfig.homePage.demo}
+            alt="The makeread.me generator, showing the block editor and live proof side by side"
+          />
+        </div>
       </motion.div>
-      <div
-        className="absolute left-[50%]
-          top-3/4 z-[-1] size-[75%] translate-x-[-50%] translate-y-[-50%] rounded-[780px] bg-themeGreen opacity-80 blur-[350px]"
-      ></div>
     </div>
   )
 }

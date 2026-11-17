@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import Image from "next/image"
 import { motion } from "framer-motion"
 
 import { siteConfig } from "@/config/site"
@@ -10,21 +9,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 const Testimonials = () => {
   return (
-    <div className="my-6">
-      <div className="text-center">
-        <h2 className="font-semibold text-themeGreen">Testimonials</h2>
-        <h1 className="mb-12 text-6xl font-bold text-white">
-          What our users say
-        </h1>
+    <div className="my-20">
+      <div className="mb-10 text-center">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+          Testimonials
+        </p>
+        <h2 className="mt-2 font-display text-4xl font-semibold text-foreground md:text-5xl">
+          What people compose
+        </h2>
       </div>
 
-      {/* Testimonials Carasoul */}
       <motion.div
-        className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
-        initial={{ x: 200, opacity: 0 }}
+        className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+        initial={{ y: 16, opacity: 0 }}
         viewport={{ once: true, amount: 0.5 }}
         transition={{ duration: 0.5 }}
-        whileInView={{ opacity: 1, x: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
       >
         {siteConfig.homePage.testimonials.map((testimonial, index) => (
           <TestimonialCard
@@ -54,23 +54,22 @@ const TestimonialCard: React.FC<ITestimonialCard> = ({
   testimony,
 }) => {
   return (
-    <div className="relative overflow-hidden rounded-[30px] bg-white bg-opacity-[0.08] px-8 py-16">
-      <div className="flex h-full flex-col items-center justify-start text-center">
-        <Avatar className="mb-4">
+    <div className="flex h-full flex-col rounded-sm border border-ink/15 bg-paper p-6 text-ink shadow-[4px_4px_0_0_hsl(var(--ink)/0.7)]">
+      <p className="font-display text-lg leading-snug">
+        &ldquo;{testimony.replace(/^"|"$/g, "")}&rdquo;
+      </p>
+      <div className="mt-6 flex items-center gap-3 border-t border-ink/15 pt-4">
+        <Avatar className="size-9 rounded-sm">
           <AvatarImage src={imageURL} alt={name} />
-          <AvatarFallback>.ME</AvatarFallback>
+          <AvatarFallback className="rounded-sm">.ME</AvatarFallback>
         </Avatar>
-        <h1 className="mb-[10px] font-bold text-white">{name}</h1>
-        <h2 className="mb-[15px] text-[#7E8A9F]">{title}</h2>
-        <p className="text-xl leading-[160%] text-white">{testimony}</p>
+        <div>
+          <p className="font-mono text-xs font-medium">{name}</p>
+          <p className="font-mono text-[10px] uppercase tracking-wide text-ink/50">
+            {title}
+          </p>
+        </div>
       </div>
-      <Image
-        className="pointer-events-none absolute bottom-0 right-0 -z-10 select-none"
-        src="icons/home/testimonialUnion.svg"
-        width={1000}
-        height={1000}
-        alt=""
-      />
     </div>
   )
 }
