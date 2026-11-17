@@ -33,6 +33,8 @@ const MainContent: React.FC<{
 
       return index.responseObject as IFunction[]
     },
+    // "/generator" has no template to load: the user starts from an empty block list.
+    enabled: templateId !== "undefined",
   })
 
   useEffect(() => {
@@ -57,8 +59,8 @@ const MainContent: React.FC<{
 
       return request.responseObject as string
     },
-    enabled:
-      populateTemplateData.data && populateTemplateData.status === "success",
+    // Depends on the chosen blocks only, so blocks added without a template still load their macros.
+    enabled: templateBlocks.length > 0,
   })
 
   useEffect(() => {
