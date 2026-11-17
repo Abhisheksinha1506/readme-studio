@@ -34,7 +34,7 @@ export default class SideBarController {
             // filter by pageType
             if (pageType.length && pageType !== 'None') {
                 blocksData = blocksData.filter((block: FullTemplate) => {
-                    return pageType.includes(block.pageType)
+                    return block.pageType === pageType
                 })
             }
 
