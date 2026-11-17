@@ -194,15 +194,3 @@ See [open issues](https://github.com/Abhisheksinha1506/readme-studio/issues) for
 
 Contributions are welcome. Fork the repo, create a feature branch, and open a pull request — see [`backend/README.md`](backend/README.md) and [`frontend/README.md`](frontend/README.md) for the development workflow of each half of the project.
 
-## License
-
-This repository does not currently include a license file. Until one is added, the default copyright rules apply (all rights reserved) — contact the maintainer before reusing this code.
-
-## Contact
-
-Project: [https://github.com/Abhisheksinha1506/readme-studio](https://github.com/Abhisheksinha1506/readme-studio)
-
-## Acknowledgments
-
-- [ShaanCoding](https://github.com/ShaanCoding) — original creator of makeread.me
-- [othneildrew](https://github.com/othneildrew), [PurpleBooth](https://github.com/PurpleBooth), [Navendu Pottekkat](https://github.com/pottekkat), [Fernanda Kipper](https://github.com/Fernanda-Kipper) — original authors of the bundled community templates
