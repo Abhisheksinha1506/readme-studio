@@ -191,10 +191,22 @@ const ReactMarkdownStyled = ({ output }: { output: string }) => {
   const [Content, setContent] = useState(createElement(Fragment))
 
   useEffect(() => {
-    ;(async () => {
-      const renderedContent = await processor.process(output)
-      setContent(renderedContent.result)
-    })()
+    // Rendering is async: ignore a result that resolves after a newer output has started rendering.
+    let isCurrent = true
+
+    processor
+      .process(output)
+      .then((renderedContent) => {
+        if (isCurrent) setContent(renderedContent.result)
+      })
+      .catch((error) => {
+        // Keep the last good preview on screen instead of leaving an unhandled rejection.
+        if (isCurrent) console.error("Failed to render markdown preview", error)
+      })
+
+    return () => {
+      isCurrent = false
+    }
   }, [output])
 
   return Content
