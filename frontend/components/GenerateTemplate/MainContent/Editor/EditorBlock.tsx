@@ -36,7 +36,7 @@ const EditorBlock = ({
   return (
     <Reorder.Item
       value={block}
-      key={block.name}
+      key={block.function}
       id={block.name}
       dragListener={false}
       dragControls={controls}
