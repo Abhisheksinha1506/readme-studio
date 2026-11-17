@@ -13,7 +13,6 @@ import RawText from "./Editor/RawText/RawText"
 import MainContentTabs from "./Tabs/MainContentTabs"
 import TabContent from "./Tabs/TabContent"
 import ToggleViewButton from "./Tabs/ToggleViewButton"
-import { compileString } from "./generator"
 import { EditModeOne, EditModeThree, EditModeTwo } from "./types"
 
 // Quiet period after the last form change before the README is recompiled.
@@ -78,26 +77,30 @@ const MainContent: React.FC<{
     }
   }, [populateMacrosData.data, populateMacrosData.status])
 
-  const generateOutput = () => {
-    if (macros && templateBlocks && debouncedVariables) {
-      const data = compileString(macros, templateBlocks, debouncedVariables)
-      setOutput(data)
-    }
-  }
+  // Rendering runs on the backend; debouncedVariables is what keeps a request
+  // from firing on every keystroke, same debounce window as before the move.
+  const compileOutput = useQuery({
+    queryKey: ["postV1TemplateCompile", macros, templateBlocks, debouncedVariables],
+    queryFn: async () => {
+      const request = await api.template.postV1TemplateCompile({
+        macros,
+        templateBlocks,
+        variables: debouncedVariables,
+      })
+
+      return request.responseObject as string
+    },
+    enabled:
+      Boolean(macros) &&
+      templateBlocks.length > 0 &&
+      templateBlocks.every((block) => macros.includes(block.function)),
+  })
 
   useEffect(() => {
-    const doesFunctionsExist = templateBlocks.every((block) => {
-      return macros.includes(block.function)
-    })
-
-    if (
-      populateTemplateData.isLoading === false &&
-      populateMacrosData.isLoading === false &&
-      doesFunctionsExist
-    ) {
-      generateOutput()
+    if (compileOutput.status === "success") {
+      setOutput(compileOutput.data!)
     }
-  }, [debouncedVariables, templateBlocks, macros])
+  }, [compileOutput.data, compileOutput.status])
 
   const [numberOfViewsToShow, setNumberOfViewsToShow] = useState<number>(2)
   const [editMode, setEditMode] = useState<

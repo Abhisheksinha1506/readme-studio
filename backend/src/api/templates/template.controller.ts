@@ -2,7 +2,8 @@ import fs from 'fs'
 import { StatusCodes } from 'http-status-codes'
 
 import { ResponseStatus, ServiceResponse } from '@/common/models/serviceResponse'
-import { DefaultBlockInput, IFunction, FullTemplateModel, MacroModel } from './template.model'
+import { compileString } from '@/common/utils/compileTemplate'
+import { CompileTemplateInput, DefaultBlockInput, IFunction, FullTemplateModel, MacroModel } from './template.model'
 
 export default class TemplateController {
     public async getTemplateInitialisedComponentList(id: string): Promise<ServiceResponse<IFunction[] | null>> {
@@ -64,6 +65,16 @@ export default class TemplateController {
             return new ServiceResponse<string>(ResponseStatus.Success, 'Success', previewData, StatusCodes.OK)
         } catch (ex) {
             return new ServiceResponse(ResponseStatus.Failed, 'Failed to get template preview', null, StatusCodes.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    public async compileTemplate(input: CompileTemplateInput): Promise<ServiceResponse<string | null>> {
+        try {
+            const rendered = compileString(input.macros, input.templateBlocks, input.variables)
+
+            return new ServiceResponse<string>(ResponseStatus.Success, 'Success', rendered, StatusCodes.OK)
+        } catch (ex) {
+            return new ServiceResponse(ResponseStatus.Failed, 'Failed to compile template', null, StatusCodes.INTERNAL_SERVER_ERROR)
         }
     }
 }

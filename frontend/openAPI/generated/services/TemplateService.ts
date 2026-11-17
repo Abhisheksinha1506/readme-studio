@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ICompileTemplateInput } from '../models/ICompileTemplateInput';
 import type { IDefaultBlockInput } from '../models/IDefaultBlockInput';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -135,6 +136,26 @@ export class TemplateService {
             path: {
                 'id': id,
             },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns any Success
+     * @throws ApiError
+     */
+    public postV1TemplateCompile(
+        requestBody: ICompileTemplateInput,
+    ): CancelablePromise<{
+        success: boolean;
+        message: string;
+        responseObject?: string;
+        statusCode: number;
+    }> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/v1/template/compile',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 }

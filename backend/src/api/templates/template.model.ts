@@ -166,6 +166,14 @@ export const DefaultBlockInputSchema = z.object({
     folder: z.string(),
 })
 
+export type CompileTemplateInput = z.infer<typeof CompileTemplateInputSchema>
+
+export const CompileTemplateInputSchema = z.object({
+    macros: z.string(),
+    templateBlocks: z.array(FunctionSchema),
+    variables: z.record(z.string(), z.unknown()),
+})
+
 // Mongoose ///////////////////////////////////////////////////////////////
 // TODO: Figure out how to use zod with mongoose
 

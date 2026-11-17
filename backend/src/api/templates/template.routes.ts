@@ -9,6 +9,8 @@ import { cacheFor, handleServiceResponse, validateRequest } from '@/common/utils
 const TEMPLATE_DATA_CACHE_SECONDS = 300
 
 import {
+    CompileTemplateInput,
+    CompileTemplateInputSchema,
     DefaultBlockInput,
     DefaultBlockInputSchema,
     FullTemplateSchema,
@@ -56,11 +58,18 @@ templateRegistry.register('ISideBarOptions', SideBarOptionsSchema)
 templateRegistry.register('IPageType', PageTypeSchema)
 
 templateRegistry.register('IDefaultBlockInput', DefaultBlockInputSchema)
+templateRegistry.register('ICompileTemplateInput', CompileTemplateInputSchema)
 
 const TemplateIdRequestSchema = z.object({ params: z.object({ id: commonValidations.templateFolder }) })
 
 const MAX_MACROS_PER_REQUEST = 100
 const MacrosRequestSchema = z.object({ body: z.array(DefaultBlockInputSchema).max(MAX_MACROS_PER_REQUEST) })
+
+const CompileRequestSchema = z.object({
+    body: CompileTemplateInputSchema.extend({
+        templateBlocks: CompileTemplateInputSchema.shape.templateBlocks.max(MAX_MACROS_PER_REQUEST),
+    }),
+})
 
 export const templateController: Router = (() => {
     const router = express.Router()
@@ -138,6 +147,32 @@ export const templateController: Router = (() => {
     router.get('/template/:id/preview', validateRequest(TemplateIdRequestSchema), cacheFor(TEMPLATE_DATA_CACHE_SECONDS), async (req: Request, res: Response) => {
         const controller = new TemplateController()
         const serviceResponse = await controller.getTemplatePreview(req.params.id)
+
+        handleServiceResponse(serviceResponse, res)
+    })
+
+    templateRegistry.registerPath({
+        method: 'post',
+        path: '/v1/template/compile',
+        tags: ['Template'],
+        requestBody: {
+            required: true,
+            content: {
+                'application/json': {
+                    schema: {
+                        $ref: '#/components/schemas/ICompileTemplateInput',
+                    },
+                },
+            },
+        },
+        responses: createApiResponse(z.string(), 'Success'),
+    })
+
+    router.post('/compile', validateRequest(CompileRequestSchema), async (req: Request, res: Response) => {
+        const body: CompileTemplateInput = req.body as CompileTemplateInput
+
+        const controller = new TemplateController()
+        const serviceResponse = await controller.compileTemplate(body)
 
         handleServiceResponse(serviceResponse, res)
     })
