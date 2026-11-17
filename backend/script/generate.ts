@@ -1,39 +1,32 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { v4 as uuidv4 } from 'uuid'
+import { v5 as uuidv5 } from 'uuid'
 import { FullTemplate, IFunction, Variable, VariableObjectSchema } from '../src/api/templates/template.model'
 
+export const UUID_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+
+export function getDeterministicUUID(name: string, namespace: string = UUID_NAMESPACE): string {
+    return uuidv5(name, namespace).replaceAll('-', '')
+}
+
 // Read directories and processes blocks.ts files
-const readDirectoriesAndConvertToJSON = async (directoryPath: string) => {
+export const readDirectoriesAndConvertToJSON = async (directoryPath: string) => {
     const directory: string = path.join(directoryPath, 'public')
 
-    fs.readdir(directory, (err, files) => {
-        if (err) {
-            console.error('Error reading root directory: ', err)
-            return
+    const files = fs.readdirSync(directory)
+    for (const file of files) {
+        const filePath = path.join(directory, file)
+        const stats = fs.statSync(filePath)
+        if (stats.isDirectory()) {
+            const variableToUUIDMap: Map<string, string> | undefined = await generateBlockJSON(filePath)
+
+            if (!variableToUUIDMap) {
+                continue
+            }
+
+            generateMacroJSON(filePath, variableToUUIDMap)
         }
-
-        files.forEach((file) => {
-            const filePath = path.join(directory, file)
-            // Check if it is a directory
-            fs.stat(filePath, async (err, stats) => {
-                if (err) {
-                    console.error('Error reading file stats: ', err)
-                    return
-                }
-
-                if (stats.isDirectory()) {
-                    const variableToUUIDMap: Map<string, string> | undefined = await generateBlockJSON(filePath)
-
-                    if (!variableToUUIDMap) {
-                        return
-                    }
-
-                    generateMacroJSON(filePath, variableToUUIDMap)
-                }
-            })
-        })
-    })
+    }
 }
 
 const generateBlockJSON = async (directoryPath: string): Promise<Map<string, string> | undefined> => {
@@ -58,12 +51,12 @@ const generateBlockJSON = async (directoryPath: string): Promise<Map<string, str
 
     data.functions.forEach((func: IFunction) => {
         // Update the macros name
-        const functionUUID = uuidv4().replaceAll('-', '')
+        const functionUUID = getDeterministicUUID(`${data.folder}:${func.function}`)
         variableToUUIDMap.set(func.function, functionUUID)
         func.function = functionUUID
 
         func.variables.forEach((variable: Variable) => {
-            const variableUUID = uuidv4().replaceAll('-', '')
+            const variableUUID = getDeterministicUUID(`${data.folder}:${func.function}:${variable.name}`)
             variableToUUIDMap.set(variable.name, variableUUID)
             variable.name = variableUUID
         })
@@ -71,14 +64,23 @@ const generateBlockJSON = async (directoryPath: string): Promise<Map<string, str
 
     data.startupBlocks = data.startupBlocks.map((element) => variableToUUIDMap.get(element)!)
 
-    fs.writeFile(path.join(directoryPath, 'blocks.json'), JSON.stringify(data), (err) => {
-        if (err) {
-            console.error('Error writing blocks.json file: ', err)
-            return undefined
-        }
-    })
+    fs.writeFileSync(path.join(directoryPath, 'blocks.json'), JSON.stringify(data))
 
     return variableToUUIDMap
+}
+
+export function escapeRegExp(string: string): string {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+export function replaceVariablesWithWordBoundaries(content: string, variableToUUIDMap: Map<string, string>): string {
+    let data = content
+    Array.from(variableToUUIDMap).forEach(([key, value]) => {
+        const escapedKey = escapeRegExp(key)
+        data = data.replace(new RegExp(`\\b${escapedKey}\\b`, 'g'), value)
+        console.log('replacing', key, value)
+    })
+    return data
 }
 
 function generateMacroJSON(directoryUrl: string, variableToUUIDMap: Map<string, string>): void {
@@ -92,11 +94,7 @@ function generateMacroJSON(directoryUrl: string, variableToUUIDMap: Map<string, 
         if (fs.lstatSync(filePath).isFile()) {
             let data = fs.readFileSync(filePath, { encoding: 'utf8' })
 
-            //  foreach ofthis hashmap
-            Array.from(variableToUUIDMap).forEach(([key, value]) => {
-                data = data.replace(new RegExp(key, 'g'), value)
-                console.log('replacing', key, value)
-            })
+            data = replaceVariablesWithWordBoundaries(data, variableToUUIDMap)
 
             result[variableToUUIDMap.get(file.replace('.njk', ''))!] = data
         }
@@ -108,4 +106,6 @@ function generateMacroJSON(directoryUrl: string, variableToUUIDMap: Map<string, 
 }
 
 const rootDirectory: string = path.join(__dirname, '..')
-readDirectoriesAndConvertToJSON(rootDirectory)
+if (require.main === module) {
+    readDirectoriesAndConvertToJSON(rootDirectory)
+}

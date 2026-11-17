@@ -1,5 +1,5 @@
 import { IFunction } from "@/openAPI/generated"
-import nunjucks from "nunjucks"
+import nunjucks from "nunjucks/browser/nunjucks"
 
 export const combineMacroIntoOrderedFunctionString = (blocks: any[]) => {
   return blocks

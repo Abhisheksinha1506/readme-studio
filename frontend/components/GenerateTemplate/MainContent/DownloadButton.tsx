@@ -1,6 +1,5 @@
 import React from "react"
 import { CheckIcon, DownloadIcon } from "lucide-react"
-import { set } from "react-hook-form"
 import { twMerge } from "tailwind-merge"
 
 import { Button } from "@/components/ui/button"
@@ -20,7 +19,8 @@ const DownloadButton: React.FC<{
       onClick={() => {
         const element = document.createElement("a")
         const file = new Blob([downloadText], { type: "text/plain" })
-        element.href = URL.createObjectURL(file)
+        const url = URL.createObjectURL(file)
+        element.href = url
         element.download = `${fileName}`
         document.body.appendChild(element)
         element.click()
@@ -31,6 +31,10 @@ const DownloadButton: React.FC<{
         setTimeout(() => {
           setIsDownloaded(false)
         }, 2000)
+
+        // Clean up
+        document.body.removeChild(element)
+        URL.revokeObjectURL(url)
       }}
     >
       {isDownloaded ? (
