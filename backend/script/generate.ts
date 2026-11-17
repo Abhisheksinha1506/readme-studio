@@ -49,6 +49,8 @@ const generateBlockJSON = async (directoryPath: string): Promise<Map<string, str
     const importedData = await import(blocksFilePath)
     const data: FullTemplate = importedData.default
 
+    assertUniqueNames(data)
+
     data.functions.forEach((func: IFunction) => {
         // Update the macros name
         const functionUUID = getDeterministicUUID(`${data.folder}:${func.function}`)
@@ -67,6 +69,37 @@ const generateBlockJSON = async (directoryPath: string): Promise<Map<string, str
     fs.writeFileSync(path.join(directoryPath, 'blocks.json'), JSON.stringify(data))
 
     return variableToUUIDMap
+}
+
+/**
+ * Guards against two functions, or two variables within one function, sharing
+ * a name in a template's source.
+ *
+ * `generateBlockJSON` derives each id deterministically from its name, so a
+ * duplicate name produces the identical id for both entries: the second
+ * silently overwrites the first in the UUID map, and both render as the same
+ * Nunjucks variable, clobbering whichever value gets set last.
+ *
+ * @param data The template as authored in blocks.ts, before id generation.
+ * @throws When a function name or a variable name repeats within the template.
+ */
+export function assertUniqueNames(data: FullTemplate): void {
+    const functionNames = new Set<string>()
+
+    data.functions.forEach((func) => {
+        if (functionNames.has(func.function)) {
+            throw new Error(`Duplicate function name "${func.function}" in template "${data.folder}"`)
+        }
+        functionNames.add(func.function)
+
+        const variableNames = new Set<string>()
+        func.variables.forEach((variable) => {
+            if (variableNames.has(variable.name)) {
+                throw new Error(`Duplicate variable name "${variable.name}" in function "${func.function}" of template "${data.folder}"`)
+            }
+            variableNames.add(variable.name)
+        })
+    })
 }
 
 export function escapeRegExp(string: string): string {

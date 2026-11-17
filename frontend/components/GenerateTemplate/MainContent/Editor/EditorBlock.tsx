@@ -97,7 +97,7 @@ const EditorBlock = ({
             {block.variables.map((variables: any, index: number) => {
               return (
                 <InputGenerator
-                  key={variables.name}
+                  key={`${block.function}-${variables.name}`}
                   variables={variables}
                   control={control}
                 />
